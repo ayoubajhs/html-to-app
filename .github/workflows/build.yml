@@ -1,0 +1,45 @@
+name: Convert HTML to APK
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Create build directory
+      run: mkdir -p build
+    
+    - name: Copy HTML files to build directory
+      run: |
+        if [ -f "index.html" ]; then
+          cp index.html build/
+        fi
+        if [ -f "style.css" ]; then
+          cp style.css build/
+        fi
+        if [ -f "script.js" ]; then
+          cp script.js build/
+        fi
+    
+    - name: Use Website to APK Action
+      uses: darkshredder/web-to-app-action@main
+      with:
+        build-folder-path: "build"
+        app-name: "تطبيق"
+        output-folder-path: "apk"
+    
+    - name: Upload APK as artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-apk
+        path: apk/
